@@ -34,8 +34,18 @@ public class MvcConfiguration {
              */
             @Override
             public void addFormatters(FormatterRegistry registry) {
-                registry.addConverter((Converter<String, LocalDate>) source -> LocalDate.parse(source, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-                registry.addConverter((Converter<String, LocalTime>) source -> LocalTime.parse(source, DateTimeFormatter.ofPattern("HH:mm")));
+                registry.addConverter(new Converter<String, LocalDate>() {
+                    @Override
+                    public LocalDate convert(String source) {
+                        return LocalDate.parse(source, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    }
+                });
+                registry.addConverter(new Converter<String, LocalTime>() {
+                    @Override
+                    public LocalTime convert(String source) {
+                        return LocalTime.parse(source, DateTimeFormatter.ofPattern("HH:mm"));
+                    }
+                });
             }
 
             /**
