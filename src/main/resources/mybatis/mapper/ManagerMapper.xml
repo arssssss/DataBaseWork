@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zyc.work.databasework.mapper.UserMapper">
+
+    <select id="selectIdByNaAndPw" resultType="string">
+        select m_id
+        from t_manager
+        where m_name = #{name}
+          and m_password = MD5(#{password})
+    </select>
+
+    <select id="selectStation" resultType="zyc.work.databasework.pojo.Station">
+        select *
+        from t_station
+    </select>
+
+    <insert id="addStation">
+        insert into t_station(s_id, s_name, s_address, s_message)
+        values (UUID(), #{s_name}, #{s_address}, #{s_message})
+    </insert>
+
+    <delete id="deleteStation">
+        delete
+        from t_station
+        where s_id = #{s_id};
+    </delete>
+
+    <select id="selectTrain" resultType="zyc.work.databasework.pojo.Train">
+        select *
+        from t_trains
+    </select>
+
+    <insert id="addTrain">
+        insert into t_trains(tr_id, tr_name, vm_id)
+        values (UUID(), #{tr_name}, #{vm_id})
+    </insert>
+
+    <delete id="deleteTrain">
+        delete
+        from t_trains
+        where tr_id = #{tr_id};
+    </delete>
+
+    <select id="selectRouterTrain" resultType="zyc.work.databasework.pojo.RouterTrain">
+        select *
+        from t_router_trains
+    </select>
+
+    <select id="selectRouterTrainByTr_id" resultType="zyc.work.databasework.pojo.RouterTrain">
+        select *
+        from t_router_trains
+        where tr_id = #{tr_id}
+    </select>
+
+    <insert id="addRouterTrain">
+        insert into t_router_trains(tr_id, r_id, rtr_departure_time, rtr_arrival_time, rtr_date)
+        values (#{tr_id}, #{r_id}, #{rtr_departure_time}, #{rtr_arrival_time}, #{rtr_date})
+    </insert>
+
+    <delete id="deleteRouterTrain">
+        delete
+        from t_router_trains
+        where tr_id = #{tr_id}
+          and r_id = #{r_id};
+    </delete>
+
+    <select id="selectRouter" resultType="zyc.work.databasework.pojo.Router">
+        select *
+        from t_router
+    </select>
+
+    <insert id="addRouter">
+        insert into t_router(r_id, r_current_station, r_next_station, r_instructions, r_distance)
+        values (UUID(), #{r_current_station}, #{r_next_station}, #{r_instructions}, #{r_distance})
+    </insert>
+
+    <delete id="deleteRouter">
+        delete
+        from t_router
+        where r_id = #{r_id};
+    </delete>
+
+    <select id="selectVehicleModel" resultType="zyc.work.databasework.pojo.VehicleModel">
+        select *
+        from t_vehicle_model
+    </select>
+
+    <insert id="addVehicleModel">
+        insert into t_vehicle_model(vm_id, vm_total, vm_name, vm_first_class, vm_second_class)
+        values (uuid(), #{vm_total}, #{vm_name}, #{vm_first_class}, #{vm_second_class})
+    </insert>
+
+    <delete id="deleteVehicleModel">
+        delete
+        from t_vehicle_model
+        where vm_id = #{vm_id};
+    </delete>
+
+</mapper>

@@ -1,0 +1,254 @@
+package zyc.work.databasework.controller;
+
+import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+import zyc.work.databasework.ResultType.ResponseResult;
+import zyc.work.databasework.annotation.toekn.LoginToken;
+import zyc.work.databasework.annotation.toekn.TokenCheck;
+import zyc.work.databasework.enums.result.ResultCode;
+import zyc.work.databasework.enums.token.TokenType;
+import zyc.work.databasework.pojo.*;
+import zyc.work.databasework.service.ManagerService;
+import zyc.work.databasework.util.TokenUtil;
+
+public class ManagerController {
+
+    @Autowired
+    public ManagerService managerService;
+
+    @Autowired
+    public TokenUtil tokenUtil;
+    /**
+     * 管理员登陆
+     * @param name
+     * @param password
+     * @return
+     */
+    @LoginToken
+    @PostMapping(value = "/managerlogin")
+    public ResponseResult managerlogin(@RequestParam @Nullable String name, @RequestParam @Nullable String password){
+        if(StringUtils.hasText(name) &&StringUtils.hasText(password)){
+            String id= managerService.login(name,password);
+            if(id!=null){
+                return new ResponseResult(ResultCode.OK.getValue(),tokenUtil.CreateToken(3600000, id, TokenType.Manager));
+            }
+        }
+        return new ResponseResult(ResultCode.ERROR.getValue(),null);
+    }
+
+    /**
+     * 获取车站信息(分页）
+     * @param startPage
+     * @param pageSize
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @GetMapping(value = "/station")
+    public ResponseResult getStations(@RequestParam(value = "startPage")Integer startPage,@RequestParam(value = "pageSize")Integer pageSize){
+        PageInfo stations = managerService.getStations(startPage, pageSize);
+        if(stations==null)
+            return new ResponseResult(ResultCode.ERROR.getValue(), "查询失败");
+        return new ResponseResult(ResultCode.OK.getValue(), stations);
+    }
+
+    /**
+     * 添加车站信息
+     * @param station
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @PostMapping(value = "/station")
+    public ResponseResult addStation(Station station){
+        if(managerService.addStation(station))
+            return new ResponseResult(ResultCode.OK.getValue(), "加入成功");
+        return new ResponseResult(ResultCode.ERROR.getValue(), "加入失败");
+    }
+
+    /**
+     * 删除车站信息
+     * @param s_id
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @DeleteMapping(value = "/station")
+    public ResponseResult deleteStation(@RequestParam(value = "s_id")String s_id){
+        if(managerService.deleteStation(s_id))
+            return new ResponseResult(ResultCode.OK.getValue(), "删除成功");
+        return new ResponseResult(ResultCode.ERROR.getValue(), "删除失败");
+    }
+
+    /**
+     * 获取车次信息(分页）
+     * @param startPage
+     * @param pageSize
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @GetMapping("/train")
+    public ResponseResult getTrains(@RequestParam(value = "startPage")Integer startPage,@RequestParam(value = "pageSize")Integer pageSize){
+        PageInfo trains = managerService.getTrains(startPage, pageSize);
+        if(trains==null)
+            return new ResponseResult(ResultCode.ERROR.getValue(), "查询失败");
+        return new ResponseResult(ResultCode.OK.getValue(), trains);
+    }
+
+    /**
+     * 添加车次信息
+     * @param train
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @PostMapping(value = "/train")
+    public ResponseResult addTrain(Train train){
+        if(managerService.addTrain(train))
+            return new ResponseResult(ResultCode.OK.getValue(), "加入成功");
+        return new ResponseResult(ResultCode.ERROR.getValue(), "加入失败");
+    }
+
+    /**
+     * 删除车次信息
+     * @param tr_id
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @DeleteMapping(value = "/train")
+    public ResponseResult deleteTrain(@RequestParam(value = "tr_id")String tr_id){
+        if(managerService.deleteTrain(tr_id))
+            return new ResponseResult(ResultCode.OK.getValue(), "删除成功");
+        return new ResponseResult(ResultCode.ERROR.getValue(), "删除失败");
+    }
+
+    /**
+     * 获取车次路线信息(分页）
+     * @param startPage
+     * @param pageSize
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @GetMapping("/routerTrain")
+    public ResponseResult getRouterTrains(@RequestParam(value = "startPage")Integer startPage,@RequestParam(value = "pageSize")Integer pageSize){
+        PageInfo trains = managerService.getRouterTrains(startPage, pageSize);
+        if(trains==null)
+            return new ResponseResult(ResultCode.ERROR.getValue(), "查询失败");
+        return new ResponseResult(ResultCode.OK.getValue(), trains);
+    }
+
+    @TokenCheck(TYPE = TokenType.Manager)
+    @GetMapping("/routerTrain/{tr_id}")
+    public ResponseResult getRouterTrainByTr_id(@PathVariable(value = "tr_id")String tr_id){
+        return new ResponseResult(ResultCode.OK.getValue(), managerService.getRouterTrainByTr_id(tr_id));
+    }
+
+    /**
+     * 添加车次路线信息
+     * @param routertrain
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @PostMapping(value = "/routerTrain")
+    public ResponseResult addRouterTrain(RouterTrain routertrain){
+        if(managerService.addRouterTrain(routertrain))
+            return new ResponseResult(ResultCode.OK.getValue(), "加入成功");
+        return new ResponseResult(ResultCode.ERROR.getValue(), "加入失败");
+    }
+
+    /**
+     * 删除车次路线信息
+     * @param tr_id
+     * @param r_id
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @DeleteMapping(value = "/routerTrain")
+    public ResponseResult deleteRouterTrain(@RequestParam(value = "tr_id")String tr_id,@RequestParam(value = "r_id")String r_id){
+        if(managerService.deleteRouterTrain(tr_id,r_id))
+            return new ResponseResult(ResultCode.OK.getValue(), "删除成功");
+        return new ResponseResult(ResultCode.ERROR.getValue(), "删除失败");
+    }
+
+    /**
+     * 获取路线信息(分页）
+     * @param startPage
+     * @param pageSize
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @GetMapping("/router")
+    public ResponseResult getRouters(@RequestParam(value = "startPage")Integer startPage,@RequestParam(value = "pageSize")Integer pageSize){
+        PageInfo trains = managerService.getRouters(startPage, pageSize);
+        if(trains==null)
+            return new ResponseResult(ResultCode.ERROR.getValue(), "查询失败");
+        return new ResponseResult(ResultCode.OK.getValue(), trains);
+    }
+
+    /**
+     * 添加路线信息
+     * @param router
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @PostMapping(value = "/router")
+    public ResponseResult addRouter(Router router){
+        if(managerService.addRouter(router))
+            return new ResponseResult(ResultCode.OK.getValue(), "加入成功");
+        return new ResponseResult(ResultCode.ERROR.getValue(), "加入失败");
+    }
+
+    /**
+     * 删除路线信息
+     * @param r_id
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @DeleteMapping(value = "/router")
+    public ResponseResult deleteRouter(@RequestParam(value = "r_id")String r_id){
+        if(managerService.deleteRouter(r_id))
+            return new ResponseResult(ResultCode.OK.getValue(), "删除成功");
+        return new ResponseResult(ResultCode.ERROR.getValue(), "删除失败");
+    }
+
+    /**
+     * 获取车型信息(分页）
+     * @param startPage
+     * @param pageSize
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @GetMapping("/vehicleModel")
+    public ResponseResult getVehicleModel(@RequestParam(value = "startPage")Integer startPage,@RequestParam(value = "pageSize")Integer pageSize){
+        PageInfo trains = managerService.getVehicleModels(startPage, pageSize);
+        if(trains==null)
+            return new ResponseResult(ResultCode.ERROR.getValue(), "查询失败");
+        return new ResponseResult(ResultCode.OK.getValue(), trains);
+    }
+
+    /**
+     * 添加车型信息
+     * @param vehicleModel
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @PostMapping(value = "/vehicleModel")
+    public ResponseResult addVehicleModel(VehicleModel vehicleModel){
+        if(managerService.addVehicleModel(vehicleModel))
+            return new ResponseResult(ResultCode.OK.getValue(), "加入成功");
+        return new ResponseResult(ResultCode.ERROR.getValue(), "加入失败");
+    }
+
+    /**
+     * 删除车型信息
+     * @param vm_id
+     * @return
+     */
+    @TokenCheck(TYPE = TokenType.Manager)
+    @DeleteMapping(value = "/vehicleModel")
+    public ResponseResult deleteVehicleModel(@RequestParam(value = "r_id")String vm_id){
+        if(managerService.deleteVehicleModel(vm_id))
+            return new ResponseResult(ResultCode.OK.getValue(), "删除成功");
+        return new ResponseResult(ResultCode.ERROR.getValue(), "删除失败");
+    }
+
+}

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zyc.work.databasework.mapper.UserMapper">
+
+    <select id="selectIdByPhAndPw" resultType="string">
+        select u_id
+        from t_user
+        where u_phone = #{phone}
+          and u_password = MD5(#{password})
+    </select>
+
+    <insert id="addUser">
+        insert
+        into t_user(u_id, u_name, u_password, u_real_name, u_phone, u_address)
+        values (UUID(), #{u_name}, MD5(#{u_password}), #{u_real_name}, #{u_phone}, #{u_address})
+    </insert>
+
+    <select id="selectIdByPh" resultType="integer">
+        select count(*)
+        from t_user
+        where phone = #{phone}
+    </select>
+
+    <select id="selectUserById" resultType="zyc.work.databasework.pojo.User">
+        select *
+        from t_user
+        where u_id = #{u_id}
+    </select>
+
+    <update id="updateUser">
+        update t_user
+        <trim prefix="set" prefixOverrides=",">
+            <if test="u_name!=null and u_name!=''">
+               , u_name=#{u_name}
+            </if>
+            <if test="u_password!=null and u_password!=''">
+                , u_password=#{u_password}
+            </if>
+            <if test="u_real_name!=null and u_real_name!=''">
+                , u_real_name=#{u_real_name}
+            </if>
+            <if test="u_phone!=null and u_phone!=''">
+                , u_phone=#{u_phone}
+            </if>
+            <if test="u_address!=null and u_address!=''">
+                , u_address=#{u_address}
+            </if>
+        </trim>
+        where u_id=#{u_id}
+    </update>
+
+    <select id="selectTicketById" resultType="zyc.work.databasework.pojo.Ticket">
+        select *
+        from t_tickets
+        where u_id = #{u_id}
+    </select>
+
+    <insert id="addTicket">
+        insert
+        into t_ticket(ti_id, u_id,tr_id, p_id, ti_departure_id,ti_terminal_id,ti_seat,ti_state)
+        values (UUID(), #{u_id}, #{tr_id}, #{p_id}, #{ti_departure_id}, #{ti_terminal_id},#{ti_seat},#{ti_state})
+    </insert>
+
+    <select id="selectPath" resultType="zyc.work.databasework.pojo.QueryPath">
+        call querypath(#{transit},#{start_station},#{end_station},#{s_date})
+    </select>
+
+    <select id="selectSeatCount" resultType="integer">
+        SELECT vm.vm_total
+        FROM t_trains AS tr
+                 JOIN t_vehicle_model AS vm ON tr.vm_id=vm.vm_id
+        WHERE tr_id=#{tr_id}
+    </select>
+
+    <select id="selectSeatState" resultType="boolean">
+        SELECT seatIsEmpty(#{start_station},#{end_station},#{tr_id},#{seat_id});
+    </select>
+
+    <select id="selectSeatStates" resultType="boolean">
+        WITH recursive r(seat_id,is_empty)AS(
+        SELECT 1 AS seat_id,
+        seatIsEmpty(#{start_station},#{end_station},#{tr_id},1) AS is_empty
+        UNION ALL
+        SELECT r.seat_id+1 AS seat_id,
+        seatIsEmpty(#{start_station},#{end_station},#{tr_id},r.seat_id+1) AS is_empty
+        FROM r
+        WHERE #{seatCount} > r.seat_id
+        )
+        SELECT is_empty FROM r;
+    </select>
+
+    <update id="refundTicket">
+        update t_ticket set ti_state='已退票' where u_id=#{u_id} and ti_id=#{ti_id}
+    </update>
+
+    <select id="existTrain" resultType="boolean">
+        select count(*)>0 from t_trains where tr_id=#{tr_id}
+    </select>
+
+    <select id="existStation" resultType="boolean">
+        SELECT COUNT(*)>0 FROM t_router_trains AS rt
+                                   JOIN t_router AS ro ON ro.r_id=rt.r_id
+        WHERE rt.tr_id=#{tr_id} ro.r_current_station = #{station} OR ro.r_next_station=#{station}
+    </select>
+
+    <select id="arrivalDate" resultType="java.time.LocalDate">
+        SELECT rt.rtr_date
+        FROM t_router_trains AS rt
+                         JOIN t_router AS ro ON ro.r_id=rt.r_id
+        WHERE rt.tr_id=#{tr_id} and ro.r_next_station=#{station}
+    </select>
+
+    <select id="arrivalTime" resultType="java.time.LocalTime">
+        SELECT rt.rtr_arrival_time
+        FROM t_router_trains AS rt
+                         JOIN t_router AS ro ON ro.r_id=rt.r_id
+        WHERE rt.tr_id=#{tr_id} and ro.r_next_station=#{station}
+    </select>
+
+    <insert id=" addRobTicket">
+        insert
+        into t_rob(rob_id , u_id , tr_id, p_id, r_departure_id,r_terminal_id,r_time,r_seat)
+        values (UUID(),#{u_id}, #{tr_id}, #{p_id}, #{r_departure_id}, #{r_terminal_id},#{r_name},#{r_seat})
+    </insert>
+
+    <select id="selectAllRobTicket" resultType="zyc.work.databasework.pojo.RobTicket">
+        SELECT *
+        FROM t_rob
+    </select>
+
+
+
+    <delete id="deleteRobTicket">
+        delete from t_rob where rob_id=#{rob_id}
+    </delete>
+
+</mapper>
