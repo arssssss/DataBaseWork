@@ -1,13 +1,17 @@
 package zyc.work.databasework.interceptor.token;
 
+import org.apache.ibatis.annotations.ResultType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import zyc.work.databasework.ResultType.ResponseResult;
 import zyc.work.databasework.annotation.toekn.LoginToken;
 import zyc.work.databasework.annotation.toekn.TokenCheck;
+import zyc.work.databasework.enums.result.ResultCode;
 import zyc.work.databasework.enums.token.TokenType;
+import zyc.work.databasework.util.SendMsgUtil;
 import zyc.work.databasework.util.TokenUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,17 +43,17 @@ public class TokenInterceptor implements HandlerInterceptor {
             }
             if (!StringUtils.hasText(token)) {
                 //未携带token
-                response.setStatus(1001);
+                SendMsgUtil.sendJsonMessage(response,new ResponseResult<>(ResultCode.ERROR.getValue(),"未登录"));
                 return false;
             }
             if (!tokenUtil.IsEffective(token)) {
                 //token过期
-                response.setStatus(1002);
+                SendMsgUtil.sendJsonMessage(response,new ResponseResult<>(ResultCode.ERROR.getValue(),"登录已过期"));
                 return false;
             }
             if (tokenUtil.getId(token, hm.getMethod().getAnnotation(TokenCheck.class).TYPE()) == null) {
                 //token无效
-                response.setStatus(1003);
+                SendMsgUtil.sendJsonMessage(response,new ResponseResult<>(ResultCode.ERROR.getValue(),"身份验证错误,请重新登录"));
                 return false;
             }
             Id.set(tokenUtil.getId(token, hm.getMethod().getAnnotation(TokenCheck.class).TYPE()));
