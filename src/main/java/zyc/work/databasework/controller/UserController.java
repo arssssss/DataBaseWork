@@ -12,9 +12,7 @@ import zyc.work.databasework.annotation.toekn.TokenCheck;
 import zyc.work.databasework.enums.result.ResultCode;
 import zyc.work.databasework.enums.token.TokenType;
 import zyc.work.databasework.interceptor.token.TokenInterceptor;
-import zyc.work.databasework.pojo.RobTicket;
-import zyc.work.databasework.pojo.Ticket;
-import zyc.work.databasework.pojo.User;
+import zyc.work.databasework.pojo.*;
 import zyc.work.databasework.service.ManagerService;
 import zyc.work.databasework.service.UserService;
 import zyc.work.databasework.util.TokenUtil;
@@ -39,11 +37,14 @@ public class UserController {
      * @return
      */
     @PostMapping("/userregister")
-    public ResponseResult register(User user){
-        boolean register = userService.register(user);
-        if(register)
-            return new ResponseResult(ResultCode.OK.getValue(), "注册成功");
-        return new ResponseResult(ResultCode.ERROR.getValue(), "注册失败");
+    public ResponseResult<String> register(User user){
+        try {
+            userService.register(user);
+            return new ResponseResult<String>(ResultCode.OK.getValue(), "注册成功");
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "注册失败");
+        }
     }
 
     /**
@@ -54,14 +55,18 @@ public class UserController {
      */
     @LoginToken
     @PostMapping(value = "/userlogin")
-    public ResponseResult userlogin(@RequestParam @Nullable String phone, @RequestParam @Nullable String password){
-        if(NumberUtils.isDigits(phone) && StringUtils.hasText(password)){
-            String id= userService.login(phone,password);
-            if(id!=null){
-                return new ResponseResult(ResultCode.OK.getValue(),tokenUtil.CreateToken(3600000, id, TokenType.User));
+    public ResponseResult<String> userlogin(@RequestParam @Nullable String phone, @RequestParam @Nullable String password){
+        try {
+            if(NumberUtils.isDigits(phone) && StringUtils.hasText(password)){
+                String id= userService.login(phone,password);
+                if(id!=null){
+                    return new ResponseResult<String>(ResultCode.OK.getValue(),tokenUtil.CreateToken(3600000, id, TokenType.User));
+                }
             }
+            throw new Exception();
+        }catch (Exception e){
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(),"登录失败");
         }
-        return new ResponseResult(ResultCode.ERROR.getValue(),null);
     }
 
     /**
@@ -71,7 +76,11 @@ public class UserController {
     @TokenCheck
     @GetMapping( "/userInformation")
     public ResponseResult getUserInformation(){
-        return new ResponseResult(ResultCode.OK.getValue(), userService.getUser(TokenInterceptor.Id.get()));
+        try {
+            return new ResponseResult<User>(ResultCode.OK.getValue(), userService.getUser(TokenInterceptor.Id.get()));
+        }catch (Exception e){
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "查询失败");
+        }
     }
 
     /**
@@ -81,9 +90,14 @@ public class UserController {
      */
     @TokenCheck
     @PutMapping("/userInformation")
-    public ResponseResult updateUserInformation(User user){
-        user.u_id=TokenInterceptor.Id.get();
-        return new ResponseResult(ResultCode.OK.getValue(), userService.updateUser(user));
+    public ResponseResult<String> updateUserInformation(User user){
+        try {
+            user.u_id=TokenInterceptor.Id.get();
+            userService.updateUser(user);
+            return new ResponseResult<String>(ResultCode.OK.getValue(), "更新成功");
+        }catch (Exception e){
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "更新失败");
+        }
     }
 
     /**
@@ -94,11 +108,14 @@ public class UserController {
      */
     @TokenCheck
     @GetMapping("/ticket")
-    public ResponseResult queryTicket(@RequestParam(value = "startPage")Integer startPage,@RequestParam(value = "pageSize")Integer pageSize){
-        PageInfo tickets = userService.getTickets(TokenInterceptor.Id.get(), startPage, pageSize);
-        if(tickets==null)
-            return new ResponseResult(ResultCode.ERROR.getValue(), "查询失败");
-        return new ResponseResult(ResultCode.OK.getValue(),tickets);
+    public ResponseResult queryTicket(@RequestParam(value = "startPage")Integer startPage,
+                                      @RequestParam(value = "pageSize")Integer pageSize){
+        try {
+            PageInfo<Ticket> tickets = userService.getTickets(TokenInterceptor.Id.get(), startPage, pageSize);
+            return new ResponseResult<PageInfo<Ticket>>(ResultCode.OK.getValue(),tickets);
+        }catch (Exception e){
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "查询失败");
+        }
     }
 
     /**
@@ -115,7 +132,12 @@ public class UserController {
                             @RequestParam(value = "end_station") String end_station,
                             @RequestParam(value = "s_date")LocalDate s_date,
                             @RequestParam(value = "transit") Integer transit){
-        return  new ResponseResult(ResultCode.OK.getValue(),userService.getPath(start_station,end_station,s_date,transit));
+        try {
+            return  new ResponseResult<List<QueryPath>>(ResultCode.OK.getValue(),userService.getPath(start_station,end_station,s_date,transit));
+        }catch (Exception e){
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "查询失败");
+        }
+
     }
 
     /**
@@ -125,11 +147,13 @@ public class UserController {
     @TokenCheck
     @PostMapping("/ticket")
     public ResponseResult buyTicket(Ticket ticket){
-        ticket.setU_id(TokenInterceptor.Id.get());
-
-        if(userService.buyTicket(ticket))
-            return new ResponseResult(ResultCode.OK.getValue(),"购买成功");
-        return new ResponseResult(ResultCode.ERROR.getValue(), "购买失败");
+        try {
+            ticket.setU_id(TokenInterceptor.Id.get());
+            userService.buyTicket(ticket);
+            return new ResponseResult<String>(ResultCode.OK.getValue(),"购买成功");
+        }catch (Exception e){
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "购买失败");
+        }
     }
 
     /**
@@ -143,10 +167,12 @@ public class UserController {
     public ResponseResult seatInformation(@RequestParam(value = "start_station") String start_station,
                                           @RequestParam(value = "end_station") String end_station,
                                           @RequestParam(value = "tr_name")String tr_name){
-        List<Boolean> booleans = userService.seatInformation(start_station, end_station, tr_name);
-        if(booleans==null)
-            return new ResponseResult(ResultCode.ERROR.getValue(), "查询失败");
-        return new ResponseResult(ResultCode.OK.getValue(), booleans);
+        try {
+            SeatInfo seatInfo = userService.seatInformation(start_station, end_station, tr_name);
+            return new ResponseResult<SeatInfo>(ResultCode.OK.getValue(), seatInfo);
+        }catch (Exception e){
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "查询失败");
+        }
     }
 
     /**
@@ -156,10 +182,13 @@ public class UserController {
      */
     @TokenCheck
     @PutMapping("/refund")
-    public ResponseResult refund(@RequestParam(value = "ti_id") String ti_id){
-        if(userService.refund(ti_id,TokenInterceptor.Id.get()))
-            return new ResponseResult(ResultCode.OK.getValue(), "退票成功");
-        return new ResponseResult(ResultCode.ERROR.getValue(), "退票失败");
+    public ResponseResult<String> refund(@RequestParam(value = "ti_id") String ti_id){
+        try {
+            userService.refund(ti_id,TokenInterceptor.Id.get());
+            return new ResponseResult<String>(ResultCode.OK.getValue(), "退票成功");
+        }catch (Exception e){
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "退票失败");
+        }
     }
 
     /**
@@ -170,10 +199,13 @@ public class UserController {
      */
     @TokenCheck
     @PostMapping("/ticketExtension")
-    public ResponseResult ticketExtension(Ticket ticket,@RequestParam(value = "extend_station")String extend_station){
-        if(!userService.addExtendTicket(ticket,extend_station,TokenInterceptor.Id.get()))
-            return new ResponseResult(ResultCode.ERROR.getValue(), "补票失败");
-        return new ResponseResult(ResultCode.OK.getValue(), "补票成功");
+    public ResponseResult<String> ticketExtension(Ticket ticket,@RequestParam(value = "extend_station")String extend_station){
+        try {
+            userService.addExtendTicket(ticket,extend_station,TokenInterceptor.Id.get());
+            return new ResponseResult<String>(ResultCode.OK.getValue(), "补票成功");
+        }catch (Exception e){
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "补票失败");
+        }
     }
 
     /**
@@ -183,9 +215,12 @@ public class UserController {
      */
     @TokenCheck
     @PostMapping("/addRobTicket")
-    public ResponseResult addRobTicket(RobTicket robTicket){
-        if(userService.addRobTicket(robTicket,TokenInterceptor.Id.get()))
-            return new ResponseResult(ResultCode.OK.getValue(), "等待抢票中");
-        return new ResponseResult(ResultCode.ERROR.getValue(), "抢票失败");
+    public ResponseResult<String> addRobTicket(RobTicket robTicket){
+        try {
+            userService.addRobTicket(robTicket,TokenInterceptor.Id.get());
+            return new ResponseResult<String>(ResultCode.OK.getValue(), "等待抢票中");
+        }catch (Exception e){
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "抢票失败");
+        }
     }
 }
