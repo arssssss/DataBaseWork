@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -38,11 +39,14 @@ public class TokenUtil {
     public boolean IsEffective(String token){
         try {
             if(StringUtils.hasText(token)){
-                DecodedJWT decode = JWT.decode(token);
+                JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret))
+                        .withIssuer(issuer)
+                        .build();
+                DecodedJWT jwt = verifier.verify(token);
                 return true;
             }
             return false;
-        }catch (JWTDecodeException e){
+        } catch (Exception e){
             return false;
         }
     }
@@ -57,7 +61,7 @@ public class TokenUtil {
                 return jwt.getClaim(type.name()).asString();
             }
             return null;
-        }catch (JWTDecodeException e){
+        }catch (Exception e){
             return null;
         }
     }

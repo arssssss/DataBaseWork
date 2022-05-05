@@ -60,7 +60,7 @@ public class UserController {
             if(NumberUtils.isDigits(phone) && StringUtils.hasText(password)){
                 String id= userService.login(phone,password);
                 if(id!=null){
-                    return new ResponseResult<String>(ResultCode.OK.getValue(),tokenUtil.CreateToken(3600000, id, TokenType.User));
+                    return new ResponseResult<String>(ResultCode.OK.getValue(),tokenUtil.CreateToken(3600, id, TokenType.User));
                 }
             }
             throw new Exception();
@@ -166,13 +166,14 @@ public class UserController {
     @GetMapping("/seatInformation")
     public ResponseResult seatInformation(@RequestParam(value = "start_station") String start_station,
                                           @RequestParam(value = "end_station") String end_station,
-                                          @RequestParam(value = "tr_name")String tr_name){
-        try {
+                                          @RequestParam(value = "tr_name")String tr_name) throws Exception {
+//        try {
             SeatInfo seatInfo = userService.seatInformation(start_station, end_station, tr_name);
             return new ResponseResult<SeatInfo>(ResultCode.OK.getValue(), seatInfo);
-        }catch (Exception e){
-            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "查询失败");
-        }
+//        }catch (Exception e){
+//
+//            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "查询失败");
+//        }
     }
 
     /**

@@ -11,5 +11,4 @@ public class Ticket {
     public String ti_departure_id;
     public String ti_terminal_id;
     public Integer ti_seat;
-    public String ti_state;
 }

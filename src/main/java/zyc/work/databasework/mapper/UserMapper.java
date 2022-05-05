@@ -31,6 +31,8 @@ public interface UserMapper {
 
     public List<QueryPath> selectPath(String start_station, String end_station, LocalDate s_date, Integer transit);
 
+    public String selectTrainIdByName(String tr_name);
+
     public Integer selectSeatCount(String tr_id);
 
     public Boolean selectSeatState(String start_station,String end_station,String tr_id,Integer seat_id);

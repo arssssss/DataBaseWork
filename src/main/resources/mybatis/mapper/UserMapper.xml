@@ -59,12 +59,16 @@
 
     <insert id="addTicket">
         insert
-        into t_ticket(ti_id, u_id,tr_id, p_id, ti_departure_id,ti_terminal_id,ti_seat,ti_state)
-        values (UUID(), #{u_id}, #{tr_id}, #{p_id}, #{ti_departure_id}, #{ti_terminal_id},#{ti_seat},#{ti_state})
+        into t_ticket(ti_id, u_id,tr_id, p_id, ti_departure_id,ti_terminal_id,ti_seat)
+        values (UUID(), #{u_id}, #{tr_id}, #{p_id}, #{ti_departure_id}, #{ti_terminal_id},#{ti_seat})
     </insert>
 
     <select id="selectPath" resultType="zyc.work.databasework.pojo.QueryPath">
-        call querypath(#{transit},#{start_station},#{end_station},#{s_date})
+        call querypathlist(#{transit},#{start_station},#{end_station},#{s_date})
+    </select>
+
+    <select id="selectTrainIdByName" resultType="string">
+        select tr_id from t_trains where tr_name=#{tr_name}
     </select>
 
     <select id="selectSeatCount" resultType="integer">
@@ -92,7 +96,7 @@
     </select>
 
     <update id="refundTicket">
-        update t_ticket set ti_state='已退票' where u_id=#{u_id} and ti_id=#{ti_id}
+        delete from t_ticket where u_id=#{u_id} and ti_id=#{ti_id}
     </update>
 
     <select id="existTrain" resultType="boolean">

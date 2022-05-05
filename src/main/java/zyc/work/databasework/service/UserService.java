@@ -63,8 +63,9 @@ public class UserService {
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public SeatInfo seatInformation(String start_station, String end_station, String tr_id) throws Exception {
+    public SeatInfo seatInformation(String start_station, String end_station, String tr_name) throws Exception {
         SeatInfo seatInfo = new SeatInfo();
+        String tr_id=userMapper.selectTrainIdByName(tr_name);
         Integer count = userMapper.selectSeatCount(tr_id);
         if(count==null)
             throw new Exception();
