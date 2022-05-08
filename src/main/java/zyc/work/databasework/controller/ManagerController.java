@@ -19,8 +19,7 @@ public class ManagerController {
     @Autowired
     public ManagerService managerService;
 
-    @Autowired
-    public TokenUtil tokenUtil;
+
     /**
      * 管理员登陆
      * @param name
@@ -31,15 +30,9 @@ public class ManagerController {
     @PostMapping(value = "/managerlogin")
     public ResponseResult managerlogin(@RequestParam @Nullable String name, @RequestParam @Nullable String password){
         try {
-            if(StringUtils.hasText(name) &&StringUtils.hasText(password)){
-                String id= managerService.login(name,password);
-                if(id!=null){
-                    return new ResponseResult(ResultCode.OK.getValue(),tokenUtil.CreateToken(3600000, id, TokenType.Manager));
-                }
-            }
-            throw new Exception();
+            return new ResponseResult(ResultCode.OK.getValue(),managerService.login(name,password));
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(),null);
+            return new ResponseResult(ResultCode.ERROR.getValue(),e.toString());
         }
     }
 
@@ -72,11 +65,8 @@ public class ManagerController {
             managerService.addStation(station);
             return new ResponseResult(ResultCode.OK.getValue(), "加入成功");
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "加入失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
-
-
-
     }
 
     /**
@@ -91,7 +81,7 @@ public class ManagerController {
             managerService.deleteStation(s_id);
             return new ResponseResult(ResultCode.OK.getValue(), "删除成功");
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "删除失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
@@ -108,7 +98,7 @@ public class ManagerController {
             PageInfo trains = managerService.getTrains(startPage, pageSize);
             return new ResponseResult(ResultCode.OK.getValue(), trains);
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "查询失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
@@ -124,7 +114,7 @@ public class ManagerController {
             managerService.addTrain(train);
             return new ResponseResult(ResultCode.OK.getValue(), "加入成功");
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "加入失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
@@ -140,7 +130,7 @@ public class ManagerController {
             managerService.deleteTrain(tr_id);
             return new ResponseResult(ResultCode.OK.getValue(), "删除成功");
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "删除失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
@@ -157,7 +147,7 @@ public class ManagerController {
             PageInfo trains = managerService.getRouterTrains(startPage, pageSize);
             return new ResponseResult(ResultCode.OK.getValue(), trains);
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "查询失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
@@ -169,7 +159,11 @@ public class ManagerController {
     @TokenCheck(TYPE = TokenType.Manager)
     @GetMapping("/routerTrain/{tr_id}")
     public ResponseResult getRouterTrainByTr_id(@PathVariable(value = "tr_id")String tr_id){
-        return new ResponseResult(ResultCode.OK.getValue(), managerService.getRouterTrainByTr_id(tr_id));
+        try {
+            return new ResponseResult(ResultCode.OK.getValue(), managerService.getRouterTrainByTr_id(tr_id));
+        }catch (Exception e){
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
+        }
     }
 
     /**
@@ -184,7 +178,7 @@ public class ManagerController {
             managerService.addRouterTrain(routertrain);
             return new ResponseResult(ResultCode.OK.getValue(), "加入成功");
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "加入失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
@@ -201,7 +195,7 @@ public class ManagerController {
             managerService.deleteRouterTrain(tr_id,r_id);
             return new ResponseResult(ResultCode.OK.getValue(), "删除成功");
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "删除失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
@@ -218,7 +212,7 @@ public class ManagerController {
             PageInfo trains = managerService.getRouters(startPage, pageSize);
             return new ResponseResult(ResultCode.OK.getValue(), trains);
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "查询失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
@@ -234,7 +228,7 @@ public class ManagerController {
             managerService.addRouter(router);
             return new ResponseResult(ResultCode.OK.getValue(), "加入成功");
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "加入失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
@@ -250,7 +244,7 @@ public class ManagerController {
             managerService.deleteRouter(r_id);
             return new ResponseResult(ResultCode.OK.getValue(), "删除成功");
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "删除失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
@@ -267,7 +261,7 @@ public class ManagerController {
             PageInfo trains = managerService.getVehicleModels(startPage, pageSize);
             return new ResponseResult(ResultCode.OK.getValue(), trains);
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "查询失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
@@ -283,7 +277,7 @@ public class ManagerController {
             managerService.addVehicleModel(vehicleModel);
             return new ResponseResult(ResultCode.OK.getValue(), "加入成功");
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "加入失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
@@ -299,7 +293,7 @@ public class ManagerController {
             managerService.deleteVehicleModel(vm_id);
             return new ResponseResult(ResultCode.OK.getValue(), "删除成功");
         }catch (Exception e){
-            return new ResponseResult(ResultCode.ERROR.getValue(), "删除失败");
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
