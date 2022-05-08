@@ -57,7 +57,7 @@ public class UserController {
      */
     @LoginToken
     @PostMapping(value = "/userlogin")
-    public ResponseResult<String> userlogin(@RequestParam @Nullable String phone, @RequestParam @Nullable String password) {
+    public ResponseResult<String> userlogin(@RequestParam String phone, @RequestParam String password) {
         try {
             String token = userService.login(phone, password);
             return new ResponseResult<String>(ResultCode.OK.getValue(), token);
