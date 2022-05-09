@@ -38,7 +38,7 @@ public class UserService {
         String id= userMapper.selectIdByPhAndPw(phone, password);
         if (id == null)
             throw new LoginFailException();
-        return  tokenUtil.CreateToken(3600, id, TokenType.User);
+        return  tokenUtil.CreateToken(3600000, id, TokenType.User);
     }
 
     @Transactional(rollbackFor = {Exception.class})

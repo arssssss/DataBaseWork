@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import zyc.work.databasework.Exception.LoginFailException;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@RequestMapping(value = "/user")
 public class UserController {
 
     @Autowired
@@ -33,12 +35,36 @@ public class UserController {
     public TokenUtil tokenUtil;
 
     /**
+     * 测试连通情况
+     * @return
+     */
+    @RequestMapping("/")
+    public ResponseResult<String> test(){
+        return new ResponseResult<>(ResultCode.OK.getValue(), "/连接成功");
+    }
+    /**
+     * 测试连通情况
+     * @return
+     */
+    @RequestMapping("/api")
+    public ResponseResult<String> test2(){
+        return new ResponseResult<>(ResultCode.OK.getValue(), "/api连接成功");
+    }
+    /**
+     * 测试连通情况
+     * @return
+     */
+    @RequestMapping("/api/")
+    public ResponseResult<String> test3(){
+        return new ResponseResult<>(ResultCode.OK.getValue(), "/api/连接成功");
+    }
+    /**
      * 用户注册
      *
      * @param user
      * @return
      */
-    @PostMapping("/userregister")
+    @PostMapping("/register")
     public ResponseResult<String> register(User user) {
         try {
             userService.register(user);
@@ -56,7 +82,7 @@ public class UserController {
      * @return
      */
     @LoginToken
-    @PostMapping(value = "/userlogin")
+    @PostMapping(value = "/login")
     public ResponseResult<String> userlogin(@RequestParam String phone, @RequestParam String password) {
         try {
             String token = userService.login(phone, password);
@@ -72,7 +98,7 @@ public class UserController {
      * @return
      */
     @TokenCheck
-    @GetMapping("/userInformation")
+    @GetMapping("/Information")
     public ResponseResult getUserInformation() {
         try {
             return new ResponseResult<User>(ResultCode.OK.getValue(), userService.getUser(TokenInterceptor.Id.get()));
@@ -88,7 +114,7 @@ public class UserController {
      * @return
      */
     @TokenCheck
-    @PutMapping("/userInformation")
+    @PutMapping("/Information")
     public ResponseResult<String> updateUserInformation(User user) {
         try {
             user.u_id = TokenInterceptor.Id.get();
