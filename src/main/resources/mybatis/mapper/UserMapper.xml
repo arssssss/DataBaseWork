@@ -33,7 +33,7 @@
         update t_user
         <trim prefix="set" prefixOverrides=",">
             <if test="u_name!=null and u_name!=''">
-               , u_name=#{u_name}
+                , u_name=#{u_name}
             </if>
             <if test="u_password!=null and u_password!=''">
                 , u_password=#{u_password}
@@ -59,8 +59,8 @@
 
     <insert id="addTicket">
         insert
-        into t_ticket(ti_id, u_id,tr_id, p_id, ti_departure_id,ti_terminal_id,ti_seat)
-        values (UUID(), #{u_id}, #{tr_id}, #{p_id}, #{ti_departure_id}, #{ti_terminal_id},#{ti_seat})
+        into t_ticket(ti_id, u_id, tr_id, p_id, ti_departure_id, ti_terminal_id, ti_seat)
+        values (UUID(), #{u_id}, #{tr_id}, #{p_id}, #{ti_departure_id}, #{ti_terminal_id}, #{ti_seat})
     </insert>
 
     <select id="selectPath" resultType="zyc.work.databasework.pojo.QueryPath">
@@ -68,65 +68,77 @@
     </select>
 
     <select id="selectTrainIdByName" resultType="string">
-        select tr_id from t_trains where tr_name=#{tr_name}
+        select tr_id
+        from t_trains
+        where tr_name = #{tr_name}
     </select>
 
-    <select id="selectSeatCount" resultType="integer">
-        SELECT vm.vm_total
+    <select id="selectSeatVehicleModel" resultType="zyc.work.databasework.pojo.VehicleModel">
+        SELECT vm.vm_id as vm_id, vm.vm_total as vm_total, vm.vm_name as vm_name,vm.vm_first_class as vm_first_class,vm.vm_second_class as vm_second_class
         FROM t_trains AS tr
-                 JOIN t_vehicle_model AS vm ON tr.vm_id=vm.vm_id
-        WHERE tr_id=#{tr_id}
+                 JOIN t_vehicle_model AS vm ON tr.vm_id = vm.vm_id
+        WHERE tr_id = #{tr_id}
     </select>
 
     <select id="selectSeatState" resultType="boolean">
-        SELECT seatIsEmpty(#{start_station},#{end_station},#{tr_id},#{seat_id});
+        SELECT seatIsEmpty(#{start_station}, #{end_station}, #{tr_id}, #{seat_id});
     </select>
 
     <select id="selectSeatStates" resultType="boolean">
-        WITH recursive r(seat_id,is_empty)AS(
-        SELECT 1 AS seat_id,
-        seatIsEmpty(#{start_station},#{end_station},#{tr_id},1) AS is_empty
-        UNION ALL
-        SELECT r.seat_id+1 AS seat_id,
-        seatIsEmpty(#{start_station},#{end_station},#{tr_id},r.seat_id+1) AS is_empty
-        FROM r
-        WHERE #{seatCount} > r.seat_id
+        WITH recursive r(seat_id, is_empty) AS (
+            SELECT 1                                                          AS seat_id,
+                   seatIsEmpty(#{start_station}, #{end_station}, #{tr_id}, 1) AS is_empty
+            UNION ALL
+            SELECT r.seat_id + 1                                                          AS seat_id,
+                   seatIsEmpty(#{start_station}, #{end_station}, #{tr_id}, r.seat_id + 1) AS is_empty
+            FROM r
+            WHERE #{seatCount} > r.seat_id
         )
-        SELECT is_empty FROM r;
+        SELECT is_empty
+        FROM r;
     </select>
 
     <update id="refundTicket">
-        delete from t_ticket where u_id=#{u_id} and ti_id=#{ti_id}
+        delete
+        from t_ticket
+        where u_id = #{u_id}
+          and ti_id = #{ti_id}
     </update>
 
     <select id="existTrain" resultType="boolean">
-        select count(*)>0 from t_trains where tr_id=#{tr_id}
+        select count(*) > 0
+        from t_trains
+        where tr_id = #{tr_id}
     </select>
 
     <select id="existStation" resultType="boolean">
-        SELECT COUNT(*)>0 FROM t_router_trains AS rt
-                                   JOIN t_router AS ro ON ro.r_id=rt.r_id
-        WHERE rt.tr_id=#{tr_id} ro.r_current_station = #{station} OR ro.r_next_station=#{station}
+        SELECT COUNT(*) > 0
+        FROM t_router_trains AS rt
+                 JOIN t_router AS ro ON ro.r_id = rt.r_id
+        WHERE rt.tr_id = #{tr_id} ro.r_current_station = #{station}
+           OR ro.r_next_station=#{station}
     </select>
 
     <select id="arrivalDate" resultType="java.time.LocalDate">
         SELECT rt.rtr_date
         FROM t_router_trains AS rt
-                         JOIN t_router AS ro ON ro.r_id=rt.r_id
-        WHERE rt.tr_id=#{tr_id} and ro.r_next_station=#{station}
+                 JOIN t_router AS ro ON ro.r_id = rt.r_id
+        WHERE rt.tr_id = #{tr_id}
+          and ro.r_next_station = #{station}
     </select>
 
     <select id="arrivalTime" resultType="java.time.LocalTime">
         SELECT rt.rtr_arrival_time
         FROM t_router_trains AS rt
-                         JOIN t_router AS ro ON ro.r_id=rt.r_id
-        WHERE rt.tr_id=#{tr_id} and ro.r_next_station=#{station}
+                 JOIN t_router AS ro ON ro.r_id = rt.r_id
+        WHERE rt.tr_id = #{tr_id}
+          and ro.r_next_station = #{station}
     </select>
 
     <insert id=" addRobTicket">
         insert
-        into t_rob(rob_id , u_id , tr_id, p_id, r_departure_id,r_terminal_id,r_time,r_seat)
-        values (UUID(),#{u_id}, #{tr_id}, #{p_id}, #{r_departure_id}, #{r_terminal_id},#{r_name},#{r_seat})
+        into t_rob(rob_id, u_id, tr_id, p_id, r_departure_id, r_terminal_id, r_time, r_seat)
+        values (UUID(), #{u_id}, #{tr_id}, #{p_id}, #{r_departure_id}, #{r_terminal_id}, #{r_name}, #{r_seat})
     </insert>
 
     <select id="selectAllRobTicket" resultType="zyc.work.databasework.pojo.RobTicket">
@@ -135,24 +147,42 @@
     </select>
 
     <delete id="deleteRobTicket">
-        delete from t_rob where rob_id=#{rob_id}
+        delete
+        from t_rob
+        where rob_id = #{rob_id}
     </delete>
 
     <select id="selectTrainByName" resultType="zyc.work.databasework.pojo.Train">
         SELECT *
         FROM t_trains
-        where tr_name=#{tr_name}
+        where tr_name = #{tr_name}
     </select>
 
     <select id="selectStationByName" resultType="zyc.work.databasework.pojo.Station">
         SELECT *
         FROM t_station
-        where s_name=#{s_name}
+        where s_name = #{s_name}
     </select>
 
     <select id="selectPrice" resultType="zyc.work.databasework.pojo.Price">
         SELECT *
         FROM t_price
+        where vm_id=#{vm_id} and
+              p_seat_price=#{p_seat_price} and
+              p_holiday=#{isHoliday}
     </select>
 
+    <select id="isHoliday" resultType="boolean">
+        select t_holiday>0 from t_calendar where t_day=#{localDate};
+    </select>
+
+    <select id="getStartStationInfo" resultType="zyc.work.databasework.pojo.RouterTrainDetail">
+        select * from t_router_train_detail
+        where tr_name=#{tr_name} and start_s_name=#{s_station_name};
+    </select>
+
+    <select id="getEndStationInfo" resultType="zyc.work.databasework.pojo.RouterTrainDetail">
+        select * from t_router_train_detail
+        where tr_name=#{tr_name} and end_s_name=#{e_station_name};
+    </select>
 </mapper>

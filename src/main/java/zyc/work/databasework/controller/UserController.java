@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -37,12 +38,14 @@ public class UserController {
 
     /**
      * 测试连通情况
+     *
      * @return
      */
     @RequestMapping("/")
-    public ResponseResult<String> test(){
+    public ResponseResult<String> test() {
         return new ResponseResult<>(ResultCode.OK.getValue(), "/连接成功");
     }
+
     /**
      * 用户注册
      *
@@ -181,7 +184,7 @@ public class UserController {
     @GetMapping("/seatInformation")
     public ResponseResult seatInformation(@RequestParam(value = "start_station") String start_station,
                                           @RequestParam(value = "end_station") String end_station,
-                                          @RequestParam(value = "tr_name") String tr_name){
+                                          @RequestParam(value = "tr_name") String tr_name) {
         try {
             SeatInfo seatInfo = userService.seatInformation(start_station, end_station, tr_name);
             return new ResponseResult<SeatInfo>(ResultCode.OK.getValue(), seatInfo);
@@ -244,45 +247,62 @@ public class UserController {
 
     /**
      * 通过车次名称获取车次信息
+     *
      * @param tr_name
      * @return
      */
     @TokenCheck
     @GetMapping("/train")
-    public ResponseResult getTrain(@RequestParam(value = "tr_name") String tr_name){
+    public ResponseResult getTrain(@RequestParam(value = "tr_name") String tr_name) {
         try {
-            return new ResponseResult<Train>(ResultCode.OK.getValue(),userService.getTrain(tr_name));
-        }catch (Exception e){
+            return new ResponseResult<Train>(ResultCode.OK.getValue(), userService.getTrain(tr_name));
+        } catch (Exception e) {
             return new ResponseResult<String>(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
     /**
      * 通过站点名称获取站点信息
+     *
      * @param s_name
      * @return
      */
     @TokenCheck
     @GetMapping("/station")
-    public ResponseResult getStation(@RequestParam(value = "s_name") String s_name){
+    public ResponseResult getStation(@RequestParam(value = "s_name") String s_name) {
         try {
-            return new ResponseResult<Station>(ResultCode.OK.getValue(),userService.getStation(s_name));
-        }catch (Exception e){
+            return new ResponseResult<Station>(ResultCode.OK.getValue(), userService.getStation(s_name));
+        } catch (Exception e) {
             return new ResponseResult<String>(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
     /**
-     * 获取所有票价的信息
+     * 获取票价的信息
+     *
      * @return
      */
     @TokenCheck
     @GetMapping("/price")
-    public ResponseResult getPrice(){
+    public ResponseResult getPrice(@RequestParam(value = "vm_id") String vm_id,
+                                   @RequestParam(value = "p_seat_style") String p_seat_style,
+                                   @RequestParam(value = "date") LocalDate date) {
         try {
-            return new ResponseResult<List<Price>>(ResultCode.OK.getValue(),userService.getPrices());
-        }catch (Exception e){
+            return new ResponseResult<List<Price>>(ResultCode.OK.getValue(), userService.getPrice(vm_id, p_seat_style, date));
+        } catch (Exception e) {
             return new ResponseResult<String>(ResultCode.ERROR.getValue(), e.toString());
+        }
+    }
+
+    @TokenCheck
+    @GetMapping("/pathInfo")
+    public ResponseResult pathInfo(@RequestParam(value = "tr_name") String tr_name,
+                                    @RequestParam(value = "s_station_name")String s_station_name,
+                                   @RequestParam(value = "e_station_name")String e_station_name){
+        try {
+            return new ResponseResult(ResultCode.OK.getValue(),userService.getPathInfo(tr_name,s_station_name,e_station_name));
+        }catch (Exception e){
+            return new ResponseResult(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 }

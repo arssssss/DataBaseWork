@@ -17,4 +17,10 @@ public class SeatInfo {
 
     public Boolean havingSeat;
 
+    public Integer firstClassNum;
+
+    public Integer secondClassNum;
+
+    public String vm_id;
+
 }

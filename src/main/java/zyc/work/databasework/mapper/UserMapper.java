@@ -2,6 +2,7 @@ package zyc.work.databasework.mapper;
 
 import org.apache.catalina.LifecycleState;
 import org.apache.ibatis.annotations.Mapper;
+import sun.text.normalizer.UBiDiProps;
 import zyc.work.databasework.pojo.*;
 
 import javax.swing.*;
@@ -30,7 +31,7 @@ public interface UserMapper {
 
     public String selectTrainIdByName(String tr_name);
 
-    public Integer selectSeatCount(String tr_id);
+    public VehicleModel selectSeatVehicleModel(String tr_id);
 
     public Boolean selectSeatState(String start_station,String end_station,String tr_id,Integer seat_id);
 
@@ -58,5 +59,11 @@ public interface UserMapper {
 
     public Station selectStationByName(String s_name);
 
-    public List<Price> selectPrice();
+    public List<Price> selectPrice(String vm_id,String p_seat_style,boolean isHoliday);
+
+    public Boolean isHoliday(LocalDate localDate);
+
+    public RouterTrainDetail getStartStationInfo(String tr_name,String s_station_name);
+
+    public RouterTrainDetail getEndStationInfo(String tr_name,String e_station_name);
 }
