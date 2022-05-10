@@ -15,6 +15,6 @@ public class Price {
 
     public BigDecimal p_price;
 
-    public String p_holiday;
+    public Boolean p_holiday;
 
 }
