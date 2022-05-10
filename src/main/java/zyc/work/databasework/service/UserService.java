@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import zyc.work.databasework.Exception.*;
 import zyc.work.databasework.ResultType.ResponseResult;
+import zyc.work.databasework.annotation.toekn.TokenCheck;
 import zyc.work.databasework.enums.result.ResultCode;
 import zyc.work.databasework.enums.token.TokenType;
 import zyc.work.databasework.mapper.UserMapper;
@@ -137,5 +138,20 @@ public class UserService {
         robTicket.u_id=u_id;
         if(userMapper.addRobTicket(robTicket)==0)
             throw new ExecException();
+    }
+
+    @Transactional(rollbackFor = {Exception.class})
+    public Train getTrain(String tr_name){
+        return userMapper.selectTrainByName(tr_name);
+    }
+
+    @Transactional(rollbackFor = {Exception.class})
+    public Station getStation(String s_name){
+        return userMapper.selectStationByName(s_name);
+    }
+
+    @Transactional(rollbackFor = {Exception.class})
+    public List<Price> getPrices(){
+        return userMapper.selectPrice();
     }
 }

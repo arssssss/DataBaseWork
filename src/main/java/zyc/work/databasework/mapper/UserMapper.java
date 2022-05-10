@@ -2,10 +2,7 @@ package zyc.work.databasework.mapper;
 
 import org.apache.catalina.LifecycleState;
 import org.apache.ibatis.annotations.Mapper;
-import zyc.work.databasework.pojo.QueryPath;
-import zyc.work.databasework.pojo.RobTicket;
-import zyc.work.databasework.pojo.Ticket;
-import zyc.work.databasework.pojo.User;
+import zyc.work.databasework.pojo.*;
 
 import javax.swing.*;
 import java.time.LocalDate;
@@ -56,4 +53,10 @@ public interface UserMapper {
     public Integer deleteRobTicket(String rob_id);
 
     public String selectStationIdByName(String s_name);
+
+    public Train selectTrainByName(String tr_name);
+
+    public Station selectStationByName(String s_name);
+
+    public List<Price> selectPrice();
 }

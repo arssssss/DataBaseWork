@@ -1,6 +1,7 @@
 package zyc.work.databasework.controller;
 
 import com.github.pagehelper.PageInfo;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
@@ -43,22 +44,6 @@ public class UserController {
         return new ResponseResult<>(ResultCode.OK.getValue(), "/连接成功");
     }
     /**
-     * 测试连通情况
-     * @return
-     */
-    @RequestMapping("/api")
-    public ResponseResult<String> test2(){
-        return new ResponseResult<>(ResultCode.OK.getValue(), "/api连接成功");
-    }
-    /**
-     * 测试连通情况
-     * @return
-     */
-    @RequestMapping("/api/")
-    public ResponseResult<String> test3(){
-        return new ResponseResult<>(ResultCode.OK.getValue(), "/api/连接成功");
-    }
-    /**
      * 用户注册
      *
      * @param user
@@ -83,7 +68,7 @@ public class UserController {
      */
     @LoginToken
     @PostMapping(value = "/login")
-    public ResponseResult<String> userlogin(@RequestParam String phone, @RequestParam String password) {
+    public ResponseResult<String> userlogin(@RequestParam(value = "phone") String phone, @RequestParam(value = "password") String password) {
         try {
             String token = userService.login(phone, password);
             return new ResponseResult<String>(ResultCode.OK.getValue(), token);
@@ -192,6 +177,7 @@ public class UserController {
      * @param tr_name       车次名
      * @return
      */
+    @TokenCheck
     @GetMapping("/seatInformation")
     public ResponseResult seatInformation(@RequestParam(value = "start_station") String start_station,
                                           @RequestParam(value = "end_station") String end_station,
@@ -252,6 +238,50 @@ public class UserController {
             userService.addRobTicket(robTicket, TokenInterceptor.Id.get());
             return new ResponseResult<String>(ResultCode.OK.getValue(), "等待抢票中");
         } catch (Exception e) {
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), e.toString());
+        }
+    }
+
+    /**
+     * 通过车次名称获取车次信息
+     * @param tr_name
+     * @return
+     */
+    @TokenCheck
+    @GetMapping("/train")
+    public ResponseResult getTrain(@RequestParam(value = "tr_name") String tr_name){
+        try {
+            return new ResponseResult<Train>(ResultCode.OK.getValue(),userService.getTrain(tr_name));
+        }catch (Exception e){
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), e.toString());
+        }
+    }
+
+    /**
+     * 通过站点名称获取站点信息
+     * @param s_name
+     * @return
+     */
+    @TokenCheck
+    @GetMapping("/station")
+    public ResponseResult getStation(@RequestParam(value = "s_name") String s_name){
+        try {
+            return new ResponseResult<Station>(ResultCode.OK.getValue(),userService.getStation(s_name));
+        }catch (Exception e){
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), e.toString());
+        }
+    }
+
+    /**
+     * 获取所有票价的信息
+     * @return
+     */
+    @TokenCheck
+    @GetMapping("/price")
+    public ResponseResult getPrice(){
+        try {
+            return new ResponseResult<List<Price>>(ResultCode.OK.getValue(),userService.getPrices());
+        }catch (Exception e){
             return new ResponseResult<String>(ResultCode.ERROR.getValue(), e.toString());
         }
     }

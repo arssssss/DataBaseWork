@@ -134,10 +134,25 @@
         FROM t_rob
     </select>
 
-
-
     <delete id="deleteRobTicket">
         delete from t_rob where rob_id=#{rob_id}
     </delete>
+
+    <select id="selectTrainByName" resultType="zyc.work.databasework.pojo.Train">
+        SELECT *
+        FROM t_trains
+        where tr_name=#{tr_name}
+    </select>
+
+    <select id="selectStationByName" resultType="zyc.work.databasework.pojo.Station">
+        SELECT *
+        FROM t_station
+        where s_name=#{s_name}
+    </select>
+
+    <select id="selectPrice" resultType="zyc.work.databasework.pojo.Price">
+        SELECT *
+        FROM t_price
+    </select>
 
 </mapper>
