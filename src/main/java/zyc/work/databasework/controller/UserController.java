@@ -246,6 +246,41 @@ public class UserController {
     }
 
     /**
+     * 根据rob_id取消抢票
+     *
+     * @param
+     * @return
+     */
+    @TokenCheck
+    @DeleteMapping("/RobTicket")
+    public ResponseResult<String> deleteRobTicket(@RequestParam(value = "rob_id")String rob_id) {
+        try {
+            userService.deleteRobTicket(rob_id, TokenInterceptor.Id.get());
+            return new ResponseResult<String>(ResultCode.OK.getValue(), "取消成功");
+        } catch (Exception e) {
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), e.toString());
+        }
+    }
+
+    /**
+     * 查看当前用户抢票信息
+     *
+     * @param
+     * @return
+     */
+    @TokenCheck
+    @PostMapping("/RobTicket")
+    public ResponseResult RobTicket(@RequestParam(value = "startPage") Integer startPage,
+                                            @RequestParam(value = "pageSize") Integer pageSize) {
+        try{
+            PageInfo<RobTicket> tickets = userService.getRobTickets(TokenInterceptor.Id.get(), startPage, pageSize);
+            return new ResponseResult<PageInfo<RobTicket>>(ResultCode.OK.getValue(), tickets);
+        } catch (Exception e) {
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "查询失败");
+        }
+    }
+
+    /**
      * 通过车次名称获取车次信息
      *
      * @param tr_name

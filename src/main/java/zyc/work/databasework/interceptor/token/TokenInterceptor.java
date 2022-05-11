@@ -43,17 +43,17 @@ public class TokenInterceptor implements HandlerInterceptor {
             }
             if (!StringUtils.hasText(token)) {
                 //未携带token
-                SendMsgUtil.sendJsonMessage(response,new ResponseResult<>(ResultCode.ERROR.getValue(),"未登录"));
+                SendMsgUtil.sendJsonMessage(response,new ResponseResult<>(ResultCode.TOKENERROR.getValue(),"未登录"));
                 return false;
             }
             if (!tokenUtil.IsEffective(token)) {
                 //token过期
-                SendMsgUtil.sendJsonMessage(response,new ResponseResult<>(ResultCode.ERROR.getValue(),"登录已过期"));
+                SendMsgUtil.sendJsonMessage(response,new ResponseResult<>(ResultCode.TOKENERROR.getValue(),"登录已过期"));
                 return false;
             }
             if (tokenUtil.getId(token, hm.getMethod().getAnnotation(TokenCheck.class).TYPE()) == null) {
                 //token无效
-                SendMsgUtil.sendJsonMessage(response,new ResponseResult<>(ResultCode.ERROR.getValue(),"身份验证错误,请重新登录"));
+                SendMsgUtil.sendJsonMessage(response,new ResponseResult<>(ResultCode.TOKENERROR.getValue(),"身份验证错误,请重新登录"));
                 return false;
             }
             Id.set(tokenUtil.getId(token, hm.getMethod().getAnnotation(TokenCheck.class).TYPE()));

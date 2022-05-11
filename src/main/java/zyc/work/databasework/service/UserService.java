@@ -183,4 +183,18 @@ public class UserService {
         pathInfo.e_time=userMapper.getEndStationInfo(tr_name,e_station_name).rtr_arrival_time;
         return pathInfo;
     }
+
+    @Transactional(rollbackFor = {Exception.class})
+    public PageInfo<RobTicket> getRobTickets(String u_id, Integer startPage, Integer pageSize) {
+        PageHelper.startPage(startPage, pageSize);
+        return new PageInfo(userMapper.selectRobTicketUById(u_id), startPage);
+    }
+
+    @Transactional(rollbackFor = {Exception.class})
+    public void deleteRobTicket(String rob_id, String u_id) throws Exception {
+        if (userMapper.selectRobTicketById(rob_id).u_id!=u_id)
+            throw new InvalidDataException();
+        else
+            userMapper.deleteRobTicket(rob_id);
+    }
 }

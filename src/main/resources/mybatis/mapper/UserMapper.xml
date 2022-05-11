@@ -199,6 +199,15 @@
     </select>
 
     <select id="getDistance" resultType="double">
-        call querydistance(#{s_station_name},#{e_station_name},#{tr_id})
+        select querydistance(#{s_station_name},#{e_station_name},#{tr_id})
+    </select>
+
+    <select id="selectRobTicketByUId" resultType="zyc.work.databasework.pojo.RobTicket">
+        select * from t_rob where u_id=#{u_id}
+    </select>
+
+    <select id="selectRobTicketById" resultType="zyc.work.databasework.pojo.RobTicket">
+        select * from t_rob where rob_id=#{rob_id}
     </select>
 </mapper>
+

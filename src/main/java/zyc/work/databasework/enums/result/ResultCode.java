@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public enum ResultCode {
-    ERROR(400),OK(200);
+    ERROR(400),OK(200),TOKENERROR(209);
 
     int value;
 

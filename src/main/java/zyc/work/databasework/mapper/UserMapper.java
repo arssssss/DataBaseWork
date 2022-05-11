@@ -72,4 +72,8 @@ public interface UserMapper {
     public RouterTrainDetail getEndStationInfo(String tr_name,String e_station_name);
 
     public Double getDistance(String tr_id,String s_station_name,String e_station_name);
+
+    public List<RobTicket> selectRobTicketUById(String u_id);
+
+    public RobTicket selectRobTicketById(String rob_id);
 }
