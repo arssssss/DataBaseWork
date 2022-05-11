@@ -135,10 +135,9 @@
           and ro.r_next_station = #{station}
     </select>
 
-    <insert id=" addRobTicket">
-        insert
-        into t_rob(rob_id, u_id, tr_id, p_id, r_departure_id, r_terminal_id, r_time, r_seat)
-        values (UUID(), #{u_id}, #{tr_id}, #{p_id}, #{r_departure_id}, #{r_terminal_id}, #{r_name}, #{r_seat})
+    <insert id="addRobTicket">
+        insert into t_rob(rob_id, u_id, tr_id, p_id, r_departure_id, r_terminal_id, r_time, r_seat)
+        values (UUID(), #{u_id}, #{tr_id}, #{p_id}, #{r_departure_id}, #{r_terminal_id}, #{r_time}, #{r_seat})
     </insert>
 
     <select id="selectAllRobTicket" resultType="zyc.work.databasework.pojo.RobTicket">
@@ -174,6 +173,12 @@
         SELECT *
         FROM t_station
         where s_id = #{s_id}
+    </select>
+
+    <select id="selectStationIdByName" resultType="string">
+        SELECT s_id
+        FROM t_station
+        where s_name = #{s_name}
     </select>
 
     <select id="selectPrice" resultType="zyc.work.databasework.pojo.Price">

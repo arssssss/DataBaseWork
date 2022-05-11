@@ -187,12 +187,12 @@ public class UserService {
     @Transactional(rollbackFor = {Exception.class})
     public PageInfo<RobTicket> getRobTickets(String u_id, Integer startPage, Integer pageSize) {
         PageHelper.startPage(startPage, pageSize);
-        return new PageInfo(userMapper.selectRobTicketUById(u_id), startPage);
+        return new PageInfo(userMapper.selectRobTicketByUId(u_id), startPage);
     }
 
     @Transactional(rollbackFor = {Exception.class})
     public void deleteRobTicket(String rob_id, String u_id) throws Exception {
-        if (userMapper.selectRobTicketById(rob_id).u_id!=u_id)
+        if (!userMapper.selectRobTicketById(rob_id).u_id.equals(u_id))
             throw new InvalidDataException();
         else
             userMapper.deleteRobTicket(rob_id);

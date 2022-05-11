@@ -269,14 +269,14 @@ public class UserController {
      * @return
      */
     @TokenCheck
-    @PostMapping("/RobTicket")
+    @GetMapping("/RobTicket")
     public ResponseResult RobTicket(@RequestParam(value = "startPage") Integer startPage,
                                             @RequestParam(value = "pageSize") Integer pageSize) {
         try{
             PageInfo<RobTicket> tickets = userService.getRobTickets(TokenInterceptor.Id.get(), startPage, pageSize);
             return new ResponseResult<PageInfo<RobTicket>>(ResultCode.OK.getValue(), tickets);
         } catch (Exception e) {
-            return new ResponseResult<String>(ResultCode.ERROR.getValue(), "查询失败");
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), e.toString());
         }
     }
 
