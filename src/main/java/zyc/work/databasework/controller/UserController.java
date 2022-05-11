@@ -262,6 +262,22 @@ public class UserController {
     }
 
     /**
+     * 通过车次id获取车次信息
+     *
+     * @param tr_id
+     * @return
+     */
+    @TokenCheck
+    @GetMapping("/train/{tr_id}")
+    public ResponseResult getTrainById(@PathVariable(value = "tr_id")String tr_id) {
+        try {
+            return new ResponseResult<List<Train>>(ResultCode.OK.getValue(), userService.getTrainById(tr_id));
+        } catch (Exception e) {
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), e.toString());
+        }
+    }
+
+    /**
      * 通过站点名称获取站点信息
      *
      * @param s_name
@@ -272,6 +288,22 @@ public class UserController {
     public ResponseResult getStation(@RequestParam(value = "s_name") String s_name) {
         try {
             return new ResponseResult<Station>(ResultCode.OK.getValue(), userService.getStation(s_name));
+        } catch (Exception e) {
+            return new ResponseResult<String>(ResultCode.ERROR.getValue(), e.toString());
+        }
+    }
+
+    /**
+     * 通过站点Id获取站点信息
+     *
+     * @param s_id
+     * @return
+     */
+    @TokenCheck
+    @GetMapping("/station/{s_id}")
+    public ResponseResult getStationById(@PathVariable(value = "s_id") String s_id) {
+        try {
+            return new ResponseResult<List<Station>>(ResultCode.OK.getValue(), userService.getStationById(s_id));
         } catch (Exception e) {
             return new ResponseResult<String>(ResultCode.ERROR.getValue(), e.toString());
         }
@@ -294,6 +326,13 @@ public class UserController {
         }
     }
 
+    /**
+     * 指定车次路线信息
+     * @param tr_name
+     * @param s_station_name
+     * @param e_station_name
+     * @return
+     */
     @TokenCheck
     @GetMapping("/pathInfo")
     public ResponseResult pathInfo(@RequestParam(value = "tr_name") String tr_name,
@@ -306,3 +345,4 @@ public class UserController {
         }
     }
 }
+

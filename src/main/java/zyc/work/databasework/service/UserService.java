@@ -93,6 +93,7 @@ public class UserService {
         seatInfo.firstClassNum = vehicleModel.vm_first_class;
         seatInfo.secondClassNum = vehicleModel.vm_second_class;
         seatInfo.vm_id = vehicleModel.vm_id;
+        seatInfo.distance=userMapper.getDistance(tr_id,start_station,end_station);
         seatInfo.booleans = userMapper.selectSeatStates(start_station, end_station, tr_id, vehicleModel.vm_total);
         seatInfo.havingSeat = false;
 
@@ -151,8 +152,18 @@ public class UserService {
     }
 
     @Transactional(rollbackFor = {Exception.class})
+    public List<Train> getTrainById(String tr_id){
+        return userMapper.selectTrainById(tr_id);
+    }
+
+    @Transactional(rollbackFor = {Exception.class})
     public Station getStation(String s_name) {
         return userMapper.selectStationByName(s_name);
+    }
+
+    @Transactional(rollbackFor = {Exception.class})
+    public List<Station> getStationById(String s_id) {
+        return userMapper.selectStationById(s_id);
     }
 
     @Transactional(rollbackFor = {Exception.class})

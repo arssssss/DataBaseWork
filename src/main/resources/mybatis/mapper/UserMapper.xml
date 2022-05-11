@@ -59,7 +59,7 @@
 
     <insert id="addTicket">
         insert
-        into t_ticket(ti_id, u_id, tr_id, p_id, ti_departure_id, ti_terminal_id, ti_seat)
+        into t_tickets(ti_id, u_id, tr_id, p_id, ti_departure_id, ti_terminal_id, ti_seat)
         values (UUID(), #{u_id}, #{tr_id}, #{p_id}, #{ti_departure_id}, #{ti_terminal_id}, #{ti_seat})
     </insert>
 
@@ -100,7 +100,7 @@
 
     <update id="refundTicket">
         delete
-        from t_ticket
+        from t_tickets
         where u_id = #{u_id}
           and ti_id = #{ti_id}
     </update>
@@ -158,17 +158,29 @@
         where tr_name = #{tr_name}
     </select>
 
+    <select id="selectTrainById" resultType="zyc.work.databasework.pojo.Train">
+        SELECT *
+        FROM t_trains
+        where tr_id = #{tr_id}
+    </select>
+
     <select id="selectStationByName" resultType="zyc.work.databasework.pojo.Station">
         SELECT *
         FROM t_station
         where s_name = #{s_name}
     </select>
 
+    <select id="selectStationById" resultType="zyc.work.databasework.pojo.Station">
+        SELECT *
+        FROM t_station
+        where s_id = #{s_id}
+    </select>
+
     <select id="selectPrice" resultType="zyc.work.databasework.pojo.Price">
         SELECT *
         FROM t_price
         where vm_id=#{vm_id} and
-              p_seat_price=#{p_seat_price} and
+              p_seat_style=#{p_seat_style} and
               p_holiday=#{isHoliday}
     </select>
 
@@ -184,5 +196,9 @@
     <select id="getEndStationInfo" resultType="zyc.work.databasework.pojo.RouterTrainDetail">
         select * from t_router_train_detail
         where tr_name=#{tr_name} and end_s_name=#{e_station_name};
+    </select>
+
+    <select id="getDistance" resultType="double">
+        call querydistance(#{s_station_name},#{e_station_name},#{tr_id})
     </select>
 </mapper>

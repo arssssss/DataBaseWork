@@ -23,4 +23,6 @@ public class SeatInfo {
 
     public String vm_id;
 
+    public Double distance;
+
 }

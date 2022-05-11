@@ -57,7 +57,11 @@ public interface UserMapper {
 
     public Train selectTrainByName(String tr_name);
 
+    public List<Train> selectTrainById(String tr_id);
+
     public Station selectStationByName(String s_name);
+
+    public List<Station> selectStationById(String s_id);
 
     public List<Price> selectPrice(String vm_id,String p_seat_style,boolean isHoliday);
 
@@ -66,4 +70,6 @@ public interface UserMapper {
     public RouterTrainDetail getStartStationInfo(String tr_name,String s_station_name);
 
     public RouterTrainDetail getEndStationInfo(String tr_name,String e_station_name);
+
+    public Double getDistance(String tr_id,String s_station_name,String e_station_name);
 }
